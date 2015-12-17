@@ -25,3 +25,26 @@ build/Release
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
+
+*.sublime-project
+*.sublime-workspace
+
+static/.tmp
+static/js/**/*.git
+static/js/bower_components
+static/bower_components
+
+**/static/dist
+**/static/css_build
+**/static/js_build
+
+gulp-assets-version-replace-version.json
+*.scssc
+*.rdb
+*.orig
+*.idea
+*.map
+.sass-cache
+.ftppass
+.cache
+*.DS_Store
