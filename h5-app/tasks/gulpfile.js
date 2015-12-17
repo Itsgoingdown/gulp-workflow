@@ -8,30 +8,35 @@ var gulp = require('gulp'),
   compass = require('gulp-compass'),
   assetsVersionReplace = require("gulp-assets-version-replace");
 
+var staticPath = '../static/';
 var versionFileDist = 'dist/';
 var globs = {
-  scss: './scss/*.scss',
-  css_build: 'css_build/',
-  js_build: 'js_build/',
-  css_build_all: 'css_build/*.css',
-  js_build_all: 'js_build/*.js'
+  scss: staticPath + 'scss/',
+  scss_all: staticPath + 'scss/*.scss',
+  css_build: staticPath + 'css_build/',
+  js_build: staticPath + 'js_build/',
+  css_build_all: staticPath + 'css_build/*.css',
+  js_build_all: staticPath + 'js_build/*.js'
 }
 
 var jsHintFiles = [
-  "js/utils.js",
-  "js/app.js"
+  staticPath + "js/utils.js",
+  staticPath + "js/app.js"
 ]
 
 var jsfiles = jsHintFiles.slice(0);
 // Some files don't need to jshint
-jsfiles.unshift("js/libs/zepto.min.js")
+jsfiles.unshift(staticPath + "js/libs/zepto.min.js")
+jsfiles.unshift(staticPath + "js/libs/template.js")
 
 gulp.task('clean', function () {
   return del([
     globs.css_build,
     globs.js_build,
     versionFileDist
-  ])
+  ], {
+    force: true
+  })
 });
 
 gulp.task('jshint', function () {
@@ -41,23 +46,27 @@ gulp.task('jshint', function () {
 });
 
 gulp.task('compass', function() {
-  return gulp.src(globs.scss)
+  return gulp.src(globs.scss_all)
     .pipe(compass({
       environment: 'production',
-      config_file: './config_dist.rb',
+      config_file: staticPath + 'config_dist.rb',
       style: 'compressed',
-      css: 'css_build',
-      sass: 'scss'
+      css: globs.css_build,
+      sass: globs.scss
     }))
 });
 
-gulp.task('js-app', ['jshint'], function () {
-  return gulp.src(jsfiles)
+gulp.task('jsMin', ['jshint'], function () {
+  gulp.src(jsfiles)
     .pipe(concat('app.js'))
+    .pipe(gulp.dest(globs.js_build));
+
+  return gulp.src([staticPath + "js/libs/zepto.min.js", staticPath + "js/libs/template.js"])
+    .pipe(concat('lib.js'))
     .pipe(gulp.dest(globs.js_build));
 });
 
-gulp.task('assetsVersion', ['compass'], function () {
+gulp.task('assetsVersion', ['compass', 'jsMin'], function () {
   return gulp.src([globs.css_build_all, globs.js_build_all])
     .pipe(assetsVersionReplace({
       tsVersionedFilesDest: versionFileDist,
@@ -69,4 +78,4 @@ gulp.task('assetsVersion', ['compass'], function () {
     .pipe(gulp.dest(versionFileDist))
 });
 
-gulp.task('default', gulpSequence('clean', 'jshint', ['compass', 'js-app'], 'assetsVersion'));
+gulp.task('default', gulpSequence('clean', 'jshint', ['compass', 'jsMin'], 'assetsVersion'));
