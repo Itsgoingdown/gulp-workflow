@@ -1,0 +1,24 @@
+{
+  "name": "gulpworkflow",
+  "version": "0.0.1",
+  "description": "gulp!",
+  "private": true,
+  "author": {
+    "name": "jfxiao",
+    "email": "07jfxiao@gmail.com",
+    "url": "http://github.com/bammoo"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "devDependencies": {
+    "del": "^2.2.0",
+    "gulp": "^3.9.0",
+    "gulp-assets-version-replace": "^2.0.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-jshint": "^2.0.0",
+    "gulp-sass": "^2.1.1",
+    "gulp-sequence": "^0.4.1"
+  }
+}
