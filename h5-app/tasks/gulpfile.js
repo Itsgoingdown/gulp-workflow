@@ -9,14 +9,14 @@ var gulp = require('gulp'),
   assetsVersionReplace = require("gulp-assets-version-replace");
 
 var staticPath = '../static/';
-var versionFileDist = 'dist/';
 var globs = {
   scss: staticPath + 'scss/',
   scss_all: staticPath + 'scss/*.scss',
   css_build: staticPath + 'css_build/',
   js_build: staticPath + 'js_build/',
-  css_build_all: staticPath + 'css_build/*.css',
-  js_build_all: staticPath + 'js_build/*.js'
+  css_build_all: staticPath + 'css_build/**/*.css',
+  js_build_all: staticPath + 'js_build/**/*.js',
+  dist: staticPath + 'dist/'
 }
 
 var jsHintFiles = [
@@ -32,8 +32,7 @@ jsfiles.unshift(staticPath + "js/libs/template.js")
 gulp.task('clean', function () {
   return del([
     globs.css_build,
-    globs.js_build,
-    versionFileDist
+    globs.js_build
   ], {
     force: true
   })
@@ -58,20 +57,21 @@ gulp.task('jsMin', ['jshint'], function () {
 
   return gulp.src([staticPath + "js/libs/zepto.min.js", staticPath + "js/libs/template.js"])
     .pipe(concat('lib.js'))
-    .pipe(gulp.dest(globs.js_build));
+    .pipe(gulp.dest(globs.js_build + 'lib/'));
 });
 
 gulp.task('assetsVersion', ['sass', 'jsMin'], function () {
-  console.log(globs.css_build_all, globs.js_build_all)
-  return gulp.src([globs.css_build_all, globs.js_build_all])
+  return gulp.src([globs.css_build_all, globs.js_build_all]
+      // Setting `base:'.'` for keeping `js`,`css` folder structure in `dist`
+      , {base: staticPath}
+    )
     .pipe(assetsVersionReplace({
-      tsVersionedFilesDest: versionFileDist,
       replaceTemplateList: [
         '../header.php',
         '../footer.php'
       ]
     }))
-    .pipe(gulp.dest(versionFileDist))
+    .pipe(gulp.dest(globs.dist))
 });
 
 gulp.task('default', gulpSequence('clean', 'jshint', ['sass', 'jsMin'], 'assetsVersion'));
